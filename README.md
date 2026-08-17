@@ -1,12 +1,23 @@
-# Spin Wheel iPhone 15 Drag v5
+# Koło 2-polowe Touch
 
-Wersja mobilna pod iPhone 15 i Safari:
-- 10 pól,
-- ceny ułożone promieniowo jak w kole teleturniejowym,
-- zielony przycisk pod kołem,
-- obracanie gestem palca,
+Wersja przygotowana pod iPhone 15 / Safari.
+
+## Funkcje
+- tylko 2 pola:
+  - 499 zł
+  - ZA DARMO
+- brak jakichkolwiek przycisków,
+- koło uruchamia się wyłącznie gestem,
+- użytkownik łapie koło palcem i obraca,
 - naturalne wyhamowanie,
-- dźwięki kliknięć,
-- jawnie opisana promocyjna stawka końcowa 499 zł.
+- dźwięki przejścia przez granice pól,
+- prawdziwe losowanie 50/50,
+- pełna obsługa safe-area na iPhone.
 
-Wgraj index.html, style.css i script.js do głównego katalogu GitHub Pages.
+## GitHub Pages
+Wgraj:
+- index.html
+- style.css
+- script.js
+
+do katalogu głównego repozytorium.
