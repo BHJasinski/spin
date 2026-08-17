@@ -1,31 +1,40 @@
-const amounts = [100, 200, 300, 400, 499, 550, 700, 900, 1200, 1500, 1800, 2200, 2500, 2800, 3000, 3300, 3500, 3800, 4000];
+const amounts = [100, 200, 350, 499, 700, 1000, 1500, 2000, 3000, 4000];
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const spinBtn = document.getElementById("spinBtn");
-const spinMain = document.getElementById("spinMain");
-const modal = document.getElementById("resultModal");
-const closeModal = document.getElementById("closeModal");
-
-const targetValue = 499;
-const targetIndex = amounts.indexOf(targetValue);
-const slice = (Math.PI * 2) / amounts.length;
 
 const colors = [
-  "#f97316", "#facc15", "#6ee7b7", "#60a5fa", "#b07ded",
-  "#f59e6b", "#5dd1c4", "#e56eb3", "#9ee12d", "#ef7188",
-  "#f1c94f", "#40b6ef", "#9a84e8", "#43c794", "#ff7a12",
-  "#6195e8", "#cf70e0", "#86cb11", "#f59e0b"
+  "#ff7474",
+  "#f7c95c",
+  "#65d7ad",
+  "#66a1ef",
+  "#ad79e7",
+  "#ff9d68",
+  "#50d0bd",
+  "#e771b2",
+  "#98d828",
+  "#f28b17"
 ];
+
+const slice = (Math.PI * 2) / amounts.length;
+const sliceDeg = 360 / amounts.length;
 
 let currentRotation = 0;
 let spinning = false;
+let audioCtx = null;
+let lastTickIndex = -1;
+let animationStart = 0;
+let animationDuration = 0;
+let animationStartRotation = 0;
+let animationEndRotation = 0;
+let animationFrameId = null;
 
 function drawWheel() {
   const size = canvas.width;
   const cx = size / 2;
   const cy = size / 2;
-  const radius = size * 0.46;
+  const radius = size * 0.455;
 
   ctx.clearRect(0, 0, size, size);
   ctx.save();
@@ -34,8 +43,8 @@ function drawWheel() {
   for (let i = 0; i < amounts.length; i++) {
     const start = -Math.PI / 2 + i * slice;
     const end = start + slice;
+    const mid = start + slice / 2;
 
-    // sektor
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius, start, end);
@@ -43,106 +52,152 @@ function drawWheel() {
     ctx.fillStyle = colors[i];
     ctx.fill();
 
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "rgba(255,255,255,.74)";
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = "rgba(255,255,255,.88)";
     ctx.stroke();
 
-    // tekst wzdłuż pola - czytelny jak w kole fortuny
-    const mid = start + slice / 2;
+    // Kwoty ustawione promieniowo, wzdłuż każdego pola.
     ctx.save();
     ctx.rotate(mid);
+    ctx.translate(radius * 0.67, 0);
 
-    const textRadius = radius * 0.72;
-    ctx.translate(textRadius, 0);
+    // Tekst biegnie od środka w stronę obręczy.
     ctx.rotate(Math.PI / 2);
 
-    const label = `${amounts[i]} zł`;
+    const value = amounts[i];
+    const label = `${value} zł`;
+    let fontSize = 62;
+    if (value >= 1000) fontSize = 54;
+    if (value >= 3000) fontSize = 50;
+
+    ctx.font = `950 ${fontSize}px Inter, Arial, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "#121826";
-    ctx.shadowColor = "rgba(255,255,255,.28)";
-    ctx.shadowBlur = 1.5;
-
-    // mniejsze fonty dla większych kwot
-    let fontSize = 46;
-    if (amounts[i] >= 1000) fontSize = 40;
-    if (amounts[i] >= 3000) fontSize = 36;
-
-    ctx.font = `900 ${fontSize}px Inter, system-ui, sans-serif`;
+    ctx.fillStyle = "#141a25";
+    ctx.shadowColor = "rgba(255,255,255,.34)";
+    ctx.shadowBlur = 2;
     ctx.fillText(label, 0, 0);
 
     ctx.restore();
   }
 
-  // obręcz zewnętrzna
+  // Zewnętrzna obręcz.
   ctx.beginPath();
-  ctx.arc(0, 0, radius + 9, 0, Math.PI * 2);
-  ctx.lineWidth = 16;
-  ctx.strokeStyle = "rgba(255,255,255,.95)";
+  ctx.arc(0, 0, radius + 10, 0, Math.PI * 2);
+  ctx.lineWidth = 22;
+  ctx.strokeStyle = "rgba(250,252,255,.98)";
   ctx.stroke();
 
-  // piasta
+  // Wewnętrzny pierścień.
   ctx.beginPath();
-  ctx.arc(0, 0, radius * 0.19, 0, Math.PI * 2);
-  ctx.fillStyle = "#f4e1b7";
+  ctx.arc(0, 0, radius * 0.20, 0, Math.PI * 2);
+  ctx.fillStyle = "#f5deb0";
   ctx.fill();
-  ctx.lineWidth = 12;
-  ctx.strokeStyle = "#f5c15a";
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = "#ffc857";
   ctx.stroke();
 
   ctx.restore();
+}
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+}
+
+function tick(volume = 0.05, pitch = 900) {
+  if (!audioCtx) return;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "square";
+  osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.045);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.05);
+}
+
+function easeOutQuint(t) {
+  return 1 - Math.pow(1 - t, 5);
 }
 
 function normalize(deg) {
   return ((deg % 360) + 360) % 360;
 }
 
-function spin() {
-  if (spinning) return;
-  spinning = true;
+function animate(timestamp) {
+  const elapsed = timestamp - animationStart;
+  const progress = Math.min(elapsed / animationDuration, 1);
+  const eased = easeOutQuint(progress);
 
-  spinBtn.disabled = true;
-  spinMain.disabled = true;
+  const rotation = animationStartRotation +
+    (animationEndRotation - animationStartRotation) * eased;
 
-  const sliceDeg = 360 / amounts.length;
-  const targetCenterDeg = targetIndex * sliceDeg + sliceDeg / 2;
-  const finalModulo = normalize(-targetCenterDeg);
+  canvas.style.transform = `rotate(${rotation}deg)`;
 
-  const currentModulo = normalize(currentRotation);
-  let delta = finalModulo - currentModulo;
-  if (delta < 0) delta += 360;
+  // Dźwięk "terkotania" wskaźnika przy przejściu przez kolejne pola.
+  const crossed = Math.floor(rotation / sliceDeg);
+  if (crossed !== lastTickIndex) {
+    lastTickIndex = crossed;
+    const speedFactor = Math.max(0.35, 1 - progress * 0.65);
+    tick(0.028 + speedFactor * 0.025, 720 + speedFactor * 420);
+  }
 
-  // kilka pełnych obrotów + zatrzymanie na 499 zł
-  const fullTurns = 9;
-  const totalDelta = fullTurns * 360 + delta;
-
-  currentRotation += totalDelta;
-
-  canvas.style.transition = "transform 7s cubic-bezier(.08,.78,.14,1)";
-  canvas.style.transform = `rotate(${currentRotation}deg)`;
-
-  setTimeout(() => {
+  if (progress < 1) {
+    animationFrameId = requestAnimationFrame(animate);
+  } else {
+    currentRotation = animationEndRotation;
     spinning = false;
     spinBtn.disabled = false;
-    spinMain.disabled = false;
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden", "false");
-  }, 7050);
+    tick(0.09, 520);
+    setTimeout(() => tick(0.06, 420), 90);
+  }
+}
+
+function spin() {
+  if (spinning) return;
+
+  ensureAudio();
+  spinning = true;
+  spinBtn.disabled = true;
+
+  // Prawdziwe losowanie jednego z 10 pól.
+  const resultIndex = Math.floor(Math.random() * amounts.length);
+
+  // Środek wybranego pola trafia pod wskaźnik.
+  const targetCenter = resultIndex * sliceDeg + sliceDeg / 2;
+  const targetModulo = normalize(-targetCenter);
+
+  const currentModulo = normalize(currentRotation);
+  let delta = targetModulo - currentModulo;
+  if (delta < 0) delta += 360;
+
+  // Wolniejsze, bardziej "fizyczne" koło:
+  // 5-6 pełnych obrotów, około 9 sekund.
+  const fullTurns = 5 + Math.floor(Math.random() * 2);
+  const totalDelta = fullTurns * 360 + delta;
+
+  animationStartRotation = currentRotation;
+  animationEndRotation = currentRotation + totalDelta;
+  animationDuration = 8800 + Math.random() * 1000;
+  animationStart = performance.now();
+  lastTickIndex = Math.floor(currentRotation / sliceDeg);
+
+  cancelAnimationFrame(animationFrameId);
+  animationFrameId = requestAnimationFrame(animate);
 }
 
 spinBtn.addEventListener("click", spin);
-spinMain.addEventListener("click", spin);
-
-closeModal.addEventListener("click", () => {
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden", "true");
-});
-
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
-  }
-});
 
 drawWheel();

@@ -1,27 +1,15 @@
-# Spin Wheel 499 v2
+# Spin Wheel 10 v3
 
-Ulepszona wersja mobilnej strony pod GitHub Pages.
+Minimalistyczna, mobilna wersja koła losowania.
 
-## Zmiany
-- lepsza czytelność kwot,
-- kwoty ustawione wzdłuż pól jak w kole fortuny,
-- animacja trwająca około 7 sekund,
-- nadal 19 pól.
+## Co zawiera
+- tylko koło, wskaźnik, kwoty i centralny przycisk SPIN,
+- dokładnie 10 pól,
+- kwoty ułożone promieniowo jak na kole fortuny,
+- wolniejsze kręcenie około 9 sekund,
+- dźwięk terkotania przy przechodzeniu wskaźnika nad polami,
+- prawdziwe losowanie jednego z 10 pól,
+- brak zewnętrznych plików audio, dźwięk generowany jest przez Web Audio API.
 
-## Pliki
-- `index.html`
-- `style.css`
-- `script.js`
-
-## Jak uruchomić na GitHub Pages
-1. Utwórz repozytorium na GitHub.
-2. Wgraj te pliki do katalogu głównego.
-3. Wejdź w `Settings -> Pages`.
-4. Wybierz:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/ (root)`
-5. Zapisz.
-
-## Uwaga
-Ta wersja pozostaje wersją promocyjną z końcową stawką 499 zł.
+## GitHub Pages
+Wgraj `index.html`, `style.css` i `script.js` do głównego katalogu repozytorium.
