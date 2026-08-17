@@ -12,10 +12,10 @@ const targetIndex = amounts.indexOf(targetValue);
 const slice = (Math.PI * 2) / amounts.length;
 
 const colors = [
-  "#ff7b72", "#f6c85f", "#6ee7b7", "#74a7ff", "#c084fc",
-  "#ff9f68", "#5eead4", "#f472b6", "#a3e635", "#fb7185",
-  "#facc15", "#38bdf8", "#a78bfa", "#34d399", "#f97316",
-  "#60a5fa", "#e879f9", "#84cc16", "#f59e0b"
+  "#f97316", "#facc15", "#6ee7b7", "#60a5fa", "#b07ded",
+  "#f59e6b", "#5dd1c4", "#e56eb3", "#9ee12d", "#ef7188",
+  "#f1c94f", "#40b6ef", "#9a84e8", "#43c794", "#ff7a12",
+  "#6195e8", "#cf70e0", "#86cb11", "#f59e0b"
 ];
 
 let currentRotation = 0;
@@ -28,7 +28,6 @@ function drawWheel() {
   const radius = size * 0.46;
 
   ctx.clearRect(0, 0, size, size);
-
   ctx.save();
   ctx.translate(cx, cy);
 
@@ -36,6 +35,7 @@ function drawWheel() {
     const start = -Math.PI / 2 + i * slice;
     const end = start + slice;
 
+    // sektor
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius, start, end);
@@ -44,33 +44,50 @@ function drawWheel() {
     ctx.fill();
 
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "rgba(255,255,255,.72)";
+    ctx.strokeStyle = "rgba(255,255,255,.74)";
     ctx.stroke();
 
-    const angle = start + slice / 2;
+    // tekst wzdłuż pola - czytelny jak w kole fortuny
+    const mid = start + slice / 2;
     ctx.save();
-    ctx.rotate(angle);
-    ctx.translate(radius * 0.66, 0);
+    ctx.rotate(mid);
+
+    const textRadius = radius * 0.72;
+    ctx.translate(textRadius, 0);
     ctx.rotate(Math.PI / 2);
 
     const label = `${amounts[i]} zł`;
-    ctx.font = amounts[i] >= 1000
-      ? "800 27px Inter, system-ui, sans-serif"
-      : "900 31px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#121826";
+    ctx.shadowColor = "rgba(255,255,255,.28)";
+    ctx.shadowBlur = 1.5;
 
-    ctx.shadowColor = "rgba(255,255,255,.45)";
-    ctx.shadowBlur = 3;
+    // mniejsze fonty dla większych kwot
+    let fontSize = 46;
+    if (amounts[i] >= 1000) fontSize = 40;
+    if (amounts[i] >= 3000) fontSize = 36;
+
+    ctx.font = `900 ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.fillText(label, 0, 0);
+
     ctx.restore();
   }
 
+  // obręcz zewnętrzna
   ctx.beginPath();
-  ctx.arc(0, 0, radius + 8, 0, Math.PI * 2);
-  ctx.lineWidth = 14;
-  ctx.strokeStyle = "rgba(255,255,255,.94)";
+  ctx.arc(0, 0, radius + 9, 0, Math.PI * 2);
+  ctx.lineWidth = 16;
+  ctx.strokeStyle = "rgba(255,255,255,.95)";
+  ctx.stroke();
+
+  // piasta
+  ctx.beginPath();
+  ctx.arc(0, 0, radius * 0.19, 0, Math.PI * 2);
+  ctx.fillStyle = "#f4e1b7";
+  ctx.fill();
+  ctx.lineWidth = 12;
+  ctx.strokeStyle = "#f5c15a";
   ctx.stroke();
 
   ctx.restore();
@@ -88,24 +105,20 @@ function spin() {
   spinMain.disabled = true;
 
   const sliceDeg = 360 / amounts.length;
-
-  // Środek pola 499 zł ma trafić dokładnie pod wskaźnik na godzinie 12.
   const targetCenterDeg = targetIndex * sliceDeg + sliceDeg / 2;
-
-  // Canvas zaczyna pierwsze pole od godziny 12, więc obrót o -targetCenterDeg
-  // ustawia środek pola 499 zł pod wskaźnikiem.
   const finalModulo = normalize(-targetCenterDeg);
 
   const currentModulo = normalize(currentRotation);
   let delta = finalModulo - currentModulo;
   if (delta < 0) delta += 360;
 
-  const fullTurns = 7 + Math.floor(Math.random() * 3);
+  // kilka pełnych obrotów + zatrzymanie na 499 zł
+  const fullTurns = 9;
   const totalDelta = fullTurns * 360 + delta;
 
   currentRotation += totalDelta;
 
-  canvas.style.transition = "transform 5.6s cubic-bezier(.11,.72,.13,1)";
+  canvas.style.transition = "transform 7s cubic-bezier(.08,.78,.14,1)";
   canvas.style.transform = `rotate(${currentRotation}deg)`;
 
   setTimeout(() => {
@@ -114,7 +127,7 @@ function spin() {
     spinMain.disabled = false;
     modal.classList.add("show");
     modal.setAttribute("aria-hidden", "false");
-  }, 5750);
+  }, 7050);
 }
 
 spinBtn.addEventListener("click", spin);

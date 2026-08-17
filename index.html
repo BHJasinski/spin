@@ -4,47 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1020" />
-  <title>Koło nagród</title>
+  <title>Losowanie stawki za stronę</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app-shell">
     <section class="hero">
-      <span class="eyebrow">PROMOCJA SPECJALNA</span>
+      <span class="eyebrow">OFERTA SPECJALNA</span>
       <h1>Zakręć kołem</h1>
-      <p class="lead">Sprawdź swoją gwarantowaną ofertę.</p>
-      <div class="guarantee">
-        <span class="dot"></span>
-        Gwarantowany wynik promocji: <strong>499 zł</strong>
-      </div>
+      <p class="lead">Sprawdź promocyjną stawkę za stronę internetową.</p>
     </section>
 
     <section class="wheel-card" aria-label="Koło promocyjne">
       <div class="pointer" aria-hidden="true"></div>
+
       <div class="wheel-wrap">
-        <canvas id="wheel" width="900" height="900" aria-label="Koło z 19 kwotami"></canvas>
-        <button id="spinBtn" class="spin-center" type="button">
+        <canvas id="wheel" width="1200" height="1200" aria-label="Koło z 19 kwotami"></canvas>
+        <button id="spinBtn" class="spin-center" type="button" aria-label="Zakręć kołem">
           <span>SPIN</span>
           <small>ZAKRĘĆ</small>
         </button>
       </div>
 
-      <button id="spinMain" class="primary-btn" type="button">
-        Zakręć kołem
-      </button>
+      <button id="spinMain" class="primary-btn" type="button">Zakręć kołem</button>
 
       <p class="fineprint">
-        Koło jest elementem prezentacji promocyjnej. Wynik 499 zł jest gwarantowany i nie jest losowy.
+        Koło prezentuje ofertę promocyjną. Końcowa stawka specjalna wynosi <strong>499 zł</strong>.
       </p>
     </section>
 
     <div id="resultModal" class="modal" aria-hidden="true">
       <div class="modal-card">
         <div class="confetti" aria-hidden="true">✦ ✧ ✦</div>
-        <span class="modal-kicker">TWÓJ WYNIK</span>
+        <span class="modal-kicker">WYNIK LOSOWANIA</span>
         <div class="result-amount">499 zł</div>
-        <p>Świetnie! To gwarantowana kwota tej promocji.</p>
-        <button id="closeModal" class="primary-btn" type="button">Gotowe</button>
+        <p>To Twoja promocyjna stawka za stronę internetową.</p>
+        <button id="closeModal" class="primary-btn" type="button">Zamknij</button>
       </div>
     </div>
   </main>
