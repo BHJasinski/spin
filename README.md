@@ -1,18 +1,12 @@
-# Spin Wheel iPhone 15 v4
+# Spin Wheel iPhone 15 Drag v5
 
-Wersja przebudowana specjalnie pod Safari / iPhone 15.
-
-Najważniejsza zmiana:
-- koło NIE używa canvas,
-- renderowane jest przez CSS conic-gradient,
-- dzięki temu powinno poprawnie działać w mobilnym Safari,
-- pełny ekran i obsługa safe-area,
+Wersja mobilna pod iPhone 15 i Safari:
 - 10 pól,
-- dźwięk tykania,
-- wolniejsze wyhamowanie około 10 sekund,
-- wynik jest rzeczywiście losowy.
+- ceny ułożone promieniowo jak w kole teleturniejowym,
+- zielony przycisk pod kołem,
+- obracanie gestem palca,
+- naturalne wyhamowanie,
+- dźwięki kliknięć,
+- jawnie opisana promocyjna stawka końcowa 499 zł.
 
-Wgraj do głównego katalogu GitHub Pages:
-- index.html
-- style.css
-- script.js
+Wgraj index.html, style.css i script.js do głównego katalogu GitHub Pages.

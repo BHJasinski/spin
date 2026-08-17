@@ -1,109 +1,15 @@
-const wheel = document.getElementById("wheel");
-const spinBtn = document.getElementById("spinBtn");
-
-const values = [100, 200, 350, 499, 700, 1000, 1500, 2000, 3000, 4000];
-const sectorDeg = 36;
-
-let spinning = false;
-let currentRotation = 0;
-let audioCtx = null;
-let rafId = null;
-
-function getAudioContext() {
-  if (!audioCtx) {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (AudioCtx) audioCtx = new AudioCtx();
-  }
-  if (audioCtx && audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
-}
-
-function playTick(strength = 1) {
-  if (!audioCtx) return;
-
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.type = "triangle";
-  osc.frequency.setValueAtTime(950 - strength * 260, audioCtx.currentTime);
-
-  const v = 0.035 + strength * 0.035;
-  gain.gain.setValueAtTime(v, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.055);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start();
-  osc.stop(audioCtx.currentTime + 0.06);
-}
-
-function easeOutQuart(t) {
-  return 1 - Math.pow(1 - t, 4);
-}
-
-function normalize(deg) {
-  return ((deg % 360) + 360) % 360;
-}
-
-function spin() {
-  if (spinning) return;
-
-  getAudioContext();
-  spinning = true;
-  spinBtn.disabled = true;
-
-  // Rzeczywisty losowy wynik spośród 10 pól.
-  const resultIndex = Math.floor(Math.random() * values.length);
-
-  // Środek sektora zostaje ustawiony dokładnie pod wskaźnikiem.
-  const sectorCenter = resultIndex * sectorDeg;
-  const targetModulo = normalize(-sectorCenter);
-
-  const currentModulo = normalize(currentRotation);
-  let delta = targetModulo - currentModulo;
-  if (delta < 0) delta += 360;
-
-  const fullTurns = 4 + Math.floor(Math.random() * 2);
-  const startRotation = currentRotation;
-  const endRotation = currentRotation + fullTurns * 360 + delta;
-
-  // Wolniejsza animacja: około 10 sekund.
-  const duration = 9500 + Math.random() * 1200;
-  const startTime = performance.now();
-
-  let previousSector = Math.floor(startRotation / sectorDeg);
-
-  cancelAnimationFrame(rafId);
-
-  function frame(now) {
-    const elapsed = now - startTime;
-    const t = Math.min(elapsed / duration, 1);
-    const eased = easeOutQuart(t);
-
-    const rotation = startRotation + (endRotation - startRotation) * eased;
-    wheel.style.transform = `rotate(${rotation}deg)`;
-
-    const sector = Math.floor(rotation / sectorDeg);
-    if (sector !== previousSector) {
-      previousSector = sector;
-      playTick(t);
-    }
-
-    if (t < 1) {
-      rafId = requestAnimationFrame(frame);
-    } else {
-      currentRotation = endRotation;
-      spinning = false;
-      spinBtn.disabled = false;
-
-      playTick(1);
-      setTimeout(() => playTick(1), 90);
-    }
-  }
-
-  rafId = requestAnimationFrame(frame);
-}
-
-spinBtn.addEventListener("click", spin, { passive: true });
+const wheel=document.getElementById("wheel"),wheelZone=document.querySelector(".wheel-zone"),spinBtn=document.getElementById("spinBtn");
+const values=[100,200,350,499,700,1000,1500,2000,3000,4000],targetIndex=values.indexOf(499),sectorDeg=36;
+let currentRotation=0,spinning=false,audioCtx=null,rafId=null,dragging=false,lastAngle=0,lastTime=0,velocity=0;
+const norm=d=>((d%360)+360)%360;
+function audio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx&&audioCtx.state==="suspended")audioCtx.resume()}
+function tick(p=0){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="triangle";o.frequency.setValueAtTime(900-p*260,audioCtx.currentTime);g.gain.setValueAtTime(.045,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.045);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.05)}
+function angle(x,y){const r=wheelZone.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;return Math.atan2(y-cy,x-cx)*180/Math.PI}
+function ease(t){return 1-Math.pow(1-t,5)}
+function animateTo499(turns=5,duration=9500){if(spinning)return;spinning=true;spinBtn.disabled=true;const target=norm(-(targetIndex*sectorDeg)),cm=norm(currentRotation);let delta=target-cm;if(delta<0)delta+=360;const start=currentRotation,end=currentRotation+turns*360+delta,t0=performance.now();let lastSector=Math.floor(currentRotation/sectorDeg);cancelAnimationFrame(rafId);
+function frame(now){const t=Math.min((now-t0)/duration,1),rot=start+(end-start)*ease(t);wheel.style.transform=`rotate(${rot}deg)`;const s=Math.floor(rot/sectorDeg);if(s!==lastSector){lastSector=s;tick(t)}if(t<1)rafId=requestAnimationFrame(frame);else{currentRotation=end;spinning=false;spinBtn.disabled=false;tick(1);setTimeout(()=>tick(1),95)}}rafId=requestAnimationFrame(frame)}
+function down(e){if(spinning)return;audio();dragging=true;wheelZone.setPointerCapture?.(e.pointerId);lastAngle=angle(e.clientX,e.clientY);lastTime=performance.now();velocity=0}
+function move(e){if(!dragging||spinning)return;const a=angle(e.clientX,e.clientY),now=performance.now();let d=a-lastAngle;if(d>180)d-=360;if(d<-180)d+=360;const dt=Math.max(8,now-lastTime);velocity=d/dt;const old=Math.floor(currentRotation/sectorDeg);currentRotation+=d;wheel.style.transform=`rotate(${currentRotation}deg)`;const neu=Math.floor(currentRotation/sectorDeg);if(old!==neu)tick(.2);lastAngle=a;lastTime=now}
+function up(e){if(!dragging||spinning)return;dragging=false;wheelZone.releasePointerCapture?.(e.pointerId);const speed=Math.min(Math.abs(velocity),1.2),turns=Math.max(2,Math.min(7,Math.round(2+speed*4.5))),duration=Math.max(6500,Math.min(10500,7000+speed*2600));animateTo499(turns,duration)}
+spinBtn.addEventListener("click",()=>{audio();animateTo499(5,9500)});
+wheelZone.addEventListener("pointerdown",down);wheelZone.addEventListener("pointermove",move);wheelZone.addEventListener("pointerup",up);wheelZone.addEventListener("pointercancel",up);
