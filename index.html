@@ -1,22 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#08101f" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#08101f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Koło losowania</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="stage">
-    <div class="pointer" aria-hidden="true"></div>
+  <main class="app">
+    <div class="wheel-shell">
+      <div class="pointer" aria-hidden="true"></div>
 
-    <div class="wheel-wrap">
-      <canvas id="wheel" width="1200" height="1200" aria-label="Koło losowania z dziesięcioma kwotami"></canvas>
+      <div id="wheel" class="wheel" aria-label="Koło losowania">
+        <div class="label l0">100 zł</div>
+        <div class="label l1">200 zł</div>
+        <div class="label l2">350 zł</div>
+        <div class="label l3">499 zł</div>
+        <div class="label l4">700 zł</div>
+        <div class="label l5">1000 zł</div>
+        <div class="label l6">1500 zł</div>
+        <div class="label l7">2000 zł</div>
+        <div class="label l8">3000 zł</div>
+        <div class="label l9">4000 zł</div>
 
-      <button id="spinBtn" class="spin-center" type="button" aria-label="Zakręć kołem">
-        SPIN
-      </button>
+        <button id="spinBtn" class="spin-btn" type="button" aria-label="Zakręć kołem">
+          SPIN
+        </button>
+      </div>
     </div>
   </main>
 

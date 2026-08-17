@@ -1,15 +1,18 @@
-# Spin Wheel 10 v3
+# Spin Wheel iPhone 15 v4
 
-Minimalistyczna, mobilna wersja koła losowania.
+Wersja przebudowana specjalnie pod Safari / iPhone 15.
 
-## Co zawiera
-- tylko koło, wskaźnik, kwoty i centralny przycisk SPIN,
-- dokładnie 10 pól,
-- kwoty ułożone promieniowo jak na kole fortuny,
-- wolniejsze kręcenie około 9 sekund,
-- dźwięk terkotania przy przechodzeniu wskaźnika nad polami,
-- prawdziwe losowanie jednego z 10 pól,
-- brak zewnętrznych plików audio, dźwięk generowany jest przez Web Audio API.
+Najważniejsza zmiana:
+- koło NIE używa canvas,
+- renderowane jest przez CSS conic-gradient,
+- dzięki temu powinno poprawnie działać w mobilnym Safari,
+- pełny ekran i obsługa safe-area,
+- 10 pól,
+- dźwięk tykania,
+- wolniejsze wyhamowanie około 10 sekund,
+- wynik jest rzeczywiście losowy.
 
-## GitHub Pages
-Wgraj `index.html`, `style.css` i `script.js` do głównego katalogu repozytorium.
+Wgraj do głównego katalogu GitHub Pages:
+- index.html
+- style.css
+- script.js
